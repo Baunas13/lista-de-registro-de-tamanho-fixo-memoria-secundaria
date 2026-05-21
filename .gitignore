@@ -71,3 +71,4 @@ Testing/
 #outros
 *.pdf
 *.dat
+.vscode/
