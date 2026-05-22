@@ -172,6 +172,12 @@ void inserir(fstream &arq, dados d)
     /*le o cabeçalho*/
     arq.read((char *)&cab, sizeof(cab));
 
+    if (cab.cabecalho.free == -1)
+    {
+        cout << "ERRO: O registro ja esta cheio!";
+        return;
+    }
+
     /*posiciona o ponteiro de leitura na primeira posição livre no arquivo*/
     arq.seekg(sizeof(cab) * cab.cabecalho.free, arq.beg);
 
