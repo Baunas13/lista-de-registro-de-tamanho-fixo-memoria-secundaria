@@ -242,9 +242,38 @@ void inserirOrdenado(fstream &arq, dados d)
 
 bool pesquisa(fstream &arq, dados &d)
 {
-    /*pesquisa a chave contida na variável d. Se encontrar retorna em d as informações
-     encontradas no registro e retorna true*/
-    cout << "pesquisa nao implementado!!!" << endl;
+    celula l, cab;
+
+    // Posiciona o ponteiro e lê o arquivo
+    arq.seekg(0, arq.beg);
+    arq.read((char *)&cab, sizeof(cab));
+
+    if (cab.cabecalho.first == -1)
+    {
+        cout << "A lista esta vazia";
+        return false;
+    }
+
+    // Posiciona o ponteiro na primeira l
+    arq.seekg(cab.cabecalho.first * sizeof(cab), arq.beg);
+
+    do
+    {
+        arq.read((char *)&l, sizeof(l));
+
+        if (l.lista.reg.chave == d.chave)
+        {
+            d = l.lista.reg;
+            return true;
+        }
+
+        if (l.lista.next != -1)
+        {
+            arq.seekg(l.lista.next * sizeof(l), arq.beg);
+        }
+
+    } while (l.lista.next != -1);
+
     return false;
 }
 
@@ -461,7 +490,7 @@ int main()
             cin >> d.chave;
             if (pesquisa(arq, d))
             {
-                cout << "\nRegistro removido:\n";
+                cout << "\nRegistro encontrado:\n";
                 cout << "Chave: " << d.chave << endl;
                 cout << "Nome: " << d.nome << endl;
             }
