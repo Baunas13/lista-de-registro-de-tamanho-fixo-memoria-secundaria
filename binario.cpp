@@ -251,13 +251,14 @@ bool pesquisa(fstream &arq, dados &d)
 bool remover(fstream &arq, dados &d)
 {
     celula l, cab;
-    int pos_atual = cab.cabecalho.first;
 
     // Coloca o ponteiro de leitura no inicio do arquivo
     arq.seekg(0, arq.beg);
 
     // Lê o cabeçalho
     arq.read((char *)&cab, sizeof(cab));
+
+    int pos_atual = cab.cabecalho.first;
 
     if (cab.cabecalho.first == -1)
     {
@@ -365,6 +366,8 @@ bool remover(fstream &arq, dados &d)
             // Atualiza a nova célula Free
             arq.seekp(pos_atual * sizeof(l), arq.beg);
             arq.write((char *)&l, sizeof(l));
+
+            d = l.lista.reg;
 
             return true;
         }
