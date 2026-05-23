@@ -236,8 +236,37 @@ void inserir(fstream &arq, dados d)
 
 void imprimirFree(fstream &arq)
 {
-    /*imprime as celulas livres no arquivo*/
-    cout << "imprimirFree nao implementado!!!" << endl;
+    /*imprime as celulas livres no arquivo
+    cout << "imprimirFree nao implementado!!!" << endl;*/
+
+    celula cab, l;
+
+    cout << endl
+         << endl
+         << "Imprimindo posições livres da lista" << endl;
+
+    //posicionando o ponteiro de leitura no inicio do arquivo e lendo o cabeçalho
+    arq.seekg(0, arq.beg);
+    arq.read((char *)&cab, sizeof(cab));
+
+    //verifica se a lista está cheia
+    if(cab.cabecalho.free == -1){
+        cout << "Lista não possui espaços livres." << endl;
+        return;
+    }
+
+    int prox = cab.cabecalho.free;
+
+    for (; prox != -1;){
+
+        arq.seekg(prox * sizeof(celula), arq.beg);
+        arq.read((char *)&l, sizeof(l));
+
+        cout << "----------------------" << endl;
+        cout << "Posição: " << prox << endl;
+
+        prox = l.lista.next;
+    }
 }
 
 void inserirOrdenado(fstream &arq, dados d)
