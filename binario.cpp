@@ -242,8 +242,114 @@ void imprimirFree(fstream &arq)
 
 void inserirOrdenado(fstream &arq, dados d)
 {
-    /*insere o dado d na ordem crescente da chave*/
-    cout << "inserirOrdenado nao implementado!!!" << endl;
+    /*insere o dado d na ordem crescente da chave
+    cout << "inserirOrdenado nao implementado!!!" << endl;*/
+
+    celula cab, l;
+    int pre, pos;
+    
+    //posiciona o ponteiro de leitura no inicio do arquivo
+    arq.seekg(0, arq.beg);
+
+    //lê o cabeçalho
+    arq.read((char *)&cab, sizeof(cab));
+
+    //verifica se a lista já está cheia
+    if(cab.cabecalho.free == -1) {
+        cout << "Lista já está cheia!" << endl;
+        return;
+    }
+
+    //verifica se a lista está vazia, nesse caso apenas chama a função inserir
+    if (cab.cabecalho.quant == 0){
+        inserir(arq,d);
+        return;
+    }   
+
+
+    pos = cab.cabecalho.free;
+    int pos_atual = cab.cabecalho.first;
+
+    for (; pos_atual != -1;)
+    {
+        arq.seekg(pos_atual * sizeof(cab), arq.beg);
+        arq.read ((char *)&l, sizeof(l));
+
+        if (d.chave < l.lista.reg.chave)
+        {
+
+            celula prox, ant, nova;
+
+            //le-se a célula que está na posição pos
+            arq.seekg(pos *sizeof(l), arq.beg);
+            arq.read((char *)&nova, sizeof(nova));
+            
+            if(l.lista.prev != -1){
+                arq.seekg(l.lista.prev * sizeof(l), arq.beg);
+                arq.read((char *)&ant, sizeof(ant));    
+            }
+            
+            // atribuindo ao registro o valor de d
+            nova.lista.reg = d;
+
+            // Atualizando o free
+            cab.cabecalho.free = nova.lista.next;
+
+            // adicionando em quant
+            cab.cabecalho.quant++;
+
+            pre = l.lista.prev;
+
+            nova.lista.next = pos_atual;
+
+            //mudamos o valor do prev de l na RAM
+            l.lista.prev = pos;
+
+            //mudança de valor na RAM
+            nova.lista.prev = pre;
+
+            //atualizando com as informações de nova
+            arq.seekp(pos *sizeof(celula), arq.beg);
+            arq.write((char *)&nova, sizeof(nova));
+
+            //posicionamento do ponteiro de escrita no inicio do arquivo
+            arq.seekp(pos_atual * sizeof(celula), arq.beg);
+
+            //atualização de l no arquivo
+            arq.write((char *)&l, sizeof(l));
+            
+            if (pre != -1)
+            {
+                ant.lista.next = pos;
+                arq.seekp(pre * sizeof(celula), arq.beg);
+                arq.write((char *)&ant, sizeof(ant));
+            }
+            else
+            {
+                cab.cabecalho.first = pos;
+                arq.seekp(0 * sizeof(l), arq.beg);
+                arq.write((char *)&cab, sizeof(cab));
+            }
+
+            //atualizando o cabeçalho
+            arq.seekp(0 * sizeof(l), arq.beg);
+            arq.write((char *)&cab, sizeof(cab));
+
+            return;
+        }
+        // Para caso o valor já esteja na lista
+        else if (d.chave == l.lista.reg.chave)
+        {
+            cout << "Valor já está na lista!";
+            return;
+        }
+        // Pula para o próximo item da lista
+        else
+        {
+            pos_atual = l.lista.next;
+        }
+    }
+    inserir(arq, d);
 }
 
 bool pesquisa(fstream &arq, dados &d)
